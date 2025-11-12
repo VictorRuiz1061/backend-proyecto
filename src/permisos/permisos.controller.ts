@@ -22,6 +22,11 @@ export class PermisosController {
     return this.permisosService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.permisosService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePermisoDto: UpdatePermisoDto) {
     return this.permisosService.update(+id, updatePermisoDto);

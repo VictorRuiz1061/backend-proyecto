@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { TipoMaterialService } from './tipo_material.service';
-import { CreateTipoMaterialDto } from './dto/create-tipo_material.dto';
+import { CreateTipoMaterialeDto } from './dto/create-tipo_material.dto';
 import { UpdateTipoMaterialDto } from './dto/update-tipo_material.dto';
 
 @Controller('tipo-material')
@@ -8,7 +8,7 @@ export class TipoMaterialController {
   constructor(private readonly tipoMaterialService: TipoMaterialService) {}
 
   @Post()
-  create(@Body() createTipoMaterialDto: CreateTipoMaterialDto) {
+  create(@Body() createTipoMaterialDto: CreateTipoMaterialeDto) {
     return this.tipoMaterialService.create(createTipoMaterialDto);
   }
 
@@ -20,6 +20,11 @@ export class TipoMaterialController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.tipoMaterialService.findOne(+id);
+  }
+
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.tipoMaterialService.search(term);
   }
 
   @Patch(':id')

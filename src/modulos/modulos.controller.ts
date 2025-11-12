@@ -22,6 +22,11 @@ export class ModulosController {
     return this.modulosService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.modulosService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateModuloDto: UpdateModuloDto) {
     return this.modulosService.update(+id, updateModuloDto);

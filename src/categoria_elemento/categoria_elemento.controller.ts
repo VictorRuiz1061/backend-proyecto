@@ -22,6 +22,11 @@ export class CategoriaElementoController {
     return this.categoriaElementoService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.categoriaElementoService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCategoriaElementoDto: UpdateCategoriaElementoDto) {
     return this.categoriaElementoService.update(+id, updateCategoriaElementoDto);

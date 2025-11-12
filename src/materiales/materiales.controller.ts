@@ -22,6 +22,11 @@ export class MaterialesController {
     return this.materialesService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.materialesService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMaterialeDto: UpdateMaterialeDto) {
     return this.materialesService.update(+id, updateMaterialeDto);

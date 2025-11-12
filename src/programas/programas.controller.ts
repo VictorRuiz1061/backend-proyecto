@@ -22,6 +22,11 @@ export class ProgramasController {
     return this.programasService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.programasService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProgramaDto: UpdateProgramaDto) {
     return this.programasService.update(+id, updateProgramaDto);

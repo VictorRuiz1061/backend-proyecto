@@ -36,6 +36,19 @@ export class AreasService {
     return area;
   }
 
+  async search(term: string) {
+    const areas = await this.areaRepository.find({
+      where: { nombre_area: term },
+      relations: ['programas'],
+    });
+
+    if (!areas.length) {
+      throw new NotFoundException(`No se encontraron áreas con el término de búsqueda "${term}"`);
+    }
+
+    return areas;
+  }
+
   async update(id: number, updateAreaDto: UpdateAreaDto) {
     const area = await this.findOne(id);
     Object.assign(area, updateAreaDto);

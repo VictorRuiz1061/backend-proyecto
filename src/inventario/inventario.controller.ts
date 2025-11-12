@@ -22,6 +22,11 @@ export class InventarioController {
     return this.inventarioService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.inventarioService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateInventarioDto: UpdateInventarioDto) {
     return this.inventarioService.update(+id, updateInventarioDto);

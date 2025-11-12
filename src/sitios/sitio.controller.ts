@@ -22,6 +22,11 @@ export class SitioController {
     return this.sitioService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.sitioService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSitioDto: UpdateSitioDto) {
     return this.sitioService.update(+id, updateSitioDto);

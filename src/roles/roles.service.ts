@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { Rol } from './entities/role.entity';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+    @InjectRepository(Rol)
+    private readonly rolRepository: Repository<Rol>,
+  ) {}
+
+  async create(createRoleDto: CreateRoleDto) {
+    const rol = this.rolRepository.create(createRoleDto);
+    return await this.rolRepository.save(rol);
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  async findAll() {
+    return await this.rolRepository.find({
+      relations: ['usuarios', 'permisos'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(id: number) {
+    const rol = await this.rolRepository.findOne({
+      where: { id_rol: id },
+      relations: ['usuarios', 'permisos'],
+    });
+
+    if (!rol) {
+      throw new NotFoundException(`Rol con ID ${id} no encontrado`);
+    }
+
+    return rol;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async search(term: string) {
+    const roles = await this.rolRepository.find({
+      where: [
+        { nombre_rol: Like(`%${term}%`) },
+        { descripcion: Like(`%${term}%`) },
+      ],
+      relations: ['usuarios', 'permisos'],
+    });
+
+    if (!roles.length) {
+      throw new NotFoundException(`No se encontraron roles con el término de búsqueda "${term}"`);
+    }
+
+    return roles;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto) {
+    const rol = await this.findOne(id);
+    Object.assign(rol, updateRoleDto);
+    return await this.rolRepository.save(rol);
+  }
+
+  async remove(id: number) {
+    const rol = await this.findOne(id);
+    return await this.rolRepository.remove(rol);
   }
 }

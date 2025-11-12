@@ -1,26 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateMaterialeDto } from './dto/create-materiale.dto';
 import { UpdateMaterialeDto } from './dto/update-materiale.dto';
+import { Material } from './entities/materiale.entity';
 
 @Injectable()
 export class MaterialesService {
-  create(createMaterialeDto: CreateMaterialeDto) {
-    return 'This action adds a new materiale';
+  constructor(
+    @InjectRepository(Material)
+    private readonly materialRepository: Repository<Material>,
+  ) {}
+
+  async create(createMaterialeDto: CreateMaterialeDto) {
+    const material = this.materialRepository.create({
+      ...createMaterialeDto,
+      categoria_id: { id_categoria_elemento: createMaterialeDto.categoria_id },
+      tipo_material_id: { id_tipo_material: createMaterialeDto.tipo_material_id },
+    });
+    return await this.materialRepository.save(material);
   }
 
-  findAll() {
-    return `This action returns all materiales`;
+  async findAll() {
+    return await this.materialRepository.find({
+      relations: ['movimientos', 'caracteristicas', 'tipo_material_id', 'categoria_id'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} materiale`;
+  async findOne(id: number) {
+    const material = await this.materialRepository.findOne({
+      where: { id_material: id },
+      relations: ['movimientos', 'caracteristicas', 'tipo_material_id', 'categoria_id'],
+    });
+
+    if (!material) {
+      throw new NotFoundException(`Material con ID ${id} no encontrado`);
+    }
+
+    return material;
   }
 
-  update(id: number, updateMaterialeDto: UpdateMaterialeDto) {
-    return `This action updates a #${id} materiale`;
+  async search(term: string) {
+    const materiales = await this.materialRepository.find({
+      where: [
+        { nombre_material: Like(`%${term}%`) },
+        { codigo_sena: Like(`%${term}%`) },
+      ],
+      relations: ['movimientos', 'caracteristicas', 'tipo_material_id', 'categoria_id'],
+    });
+
+    if (!materiales.length) {
+      throw new NotFoundException(`No se encontraron materiales con el término de búsqueda "${term}"`);
+    }
+
+    return materiales;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} materiale`;
+  async update(id: number, updateMaterialeDto: UpdateMaterialeDto) {
+    const material = await this.findOne(id);
+    Object.assign(material, updateMaterialeDto);
+    return await this.materialRepository.save(material);
+  }
+
+  async remove(id: number) {
+    const material = await this.findOne(id);
+    return await this.materialRepository.remove(material);
   }
 }

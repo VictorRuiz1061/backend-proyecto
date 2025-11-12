@@ -22,6 +22,11 @@ export class MovimientoController {
     return this.movimientoService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.movimientoService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMovimientoDto: UpdateMovimientoDto) {
     return this.movimientoService.update(+id, updateMovimientoDto);

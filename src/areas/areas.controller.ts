@@ -22,6 +22,11 @@ export class AreasController {
     return this.areasService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.areasService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
     return this.areasService.update(+id, updateAreaDto);

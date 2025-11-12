@@ -1,22 +1,11 @@
-import { IsNotEmpty, IsString, IsNumber, IsBoolean } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateAreaDto {
   @IsNotEmpty({ message: 'El nombre del área no puede estar vacío.' })
   @IsString({ message: 'El nombre del área debe ser una cadena de texto.' })
   nombre_area: string;
 
-  @IsNotEmpty({ message: 'El estado no puede estar vacío.' })
+  @IsOptional()
   @IsBoolean({ message: 'El estado debe ser un valor booleano (verdadero/falso).'})
-  @Transform(({ value }) => value === 'true' || value === true || value === 1)
   estado: boolean;
-
-  @IsNotEmpty({ message: 'La fecha de creación no puede estar vacía.' })
-  @IsString({ message: 'La fecha de creación debe ser una cadena de texto.' })
-  fecha_creacion: string;
-
-  @IsNotEmpty({ message: 'La fecha de modificación no puede estar vacía.' })
-  @IsString({ message: 'La fecha de modificación debe ser una cadena de texto.'})
-  fecha_modificacion: string;
-
 }

@@ -22,6 +22,11 @@ export class TipoSitioController {
     return this.tipoSitioService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.tipoSitioService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTipoSitioDto: UpdateTipoSitioDto) {
     return this.tipoSitioService.update(+id, updateTipoSitioDto);

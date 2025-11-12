@@ -22,6 +22,11 @@ export class CaracteristicasController {
     return this.caracteristicasService.findOne(+id);
   }
 
+  @Get('search/:term')
+  search(@Param('term') term: string) {
+    return this.caracteristicasService.search(term);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCaracteristicaDto: UpdateCaracteristicaDto) {
     return this.caracteristicasService.update(+id, updateCaracteristicaDto);
