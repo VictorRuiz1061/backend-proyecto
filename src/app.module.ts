@@ -17,6 +17,8 @@ import { CaracteristicasModule } from './caracteristicas/caracteristicas.module'
 import { InventarioModule } from './inventario/inventario.module';
 import { TipoMaterialModule } from './tipo_material/tipo_material.module';
 import { CategoriaElementoModule } from './categoria_elemento/categoria_elemento.module';
+import { SeedModule } from './seeders/seed.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { CategoriaElementoModule } from './categoria_elemento/categoria_elemento
     InventarioModule,
     TipoMaterialModule,
     CategoriaElementoModule,
+    AuthModule,
+    SeedModule,
   ],
   controllers: [],
   providers: [],
