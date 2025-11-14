@@ -8,7 +8,7 @@ export class Sitio {
   @PrimaryGeneratedColumn()
   id_sitio: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   nombre_sitio: string;
 
   @Column('text')

@@ -7,7 +7,7 @@ export class Programa {
   @PrimaryGeneratedColumn()
   id_programa: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   nombre_programa: string;
 
   @Column({ type: 'boolean', default: true })

@@ -6,7 +6,7 @@ export class Area {
   @PrimaryGeneratedColumn()
   id_area: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   nombre_area: string;
 
   @Column({ type: 'boolean', default: true })

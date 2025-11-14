@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateTiposMovimientoDto } from './dto/create-tipo_movimiento.dto';
@@ -13,8 +13,15 @@ export class TipoMovimientoService {
   ) {}
 
   async create(createTipoMovimientoDto: CreateTiposMovimientoDto) {
-    const tipoMovimiento = this.tipoMovimientoRepository.create(createTipoMovimientoDto);
-    return await this.tipoMovimientoRepository.save(tipoMovimiento);
+    try {
+      const tipoMovimiento = this.tipoMovimientoRepository.create(createTipoMovimientoDto);
+      return await this.tipoMovimientoRepository.save(tipoMovimiento);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de movimiento '${createTipoMovimientoDto.tipo_movimiento}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -52,7 +59,14 @@ export class TipoMovimientoService {
   async update(id: number, updateTipoMovimientoDto: UpdateTipoMovimientoDto) {
     const tipoMovimiento = await this.findOne(id);
     Object.assign(tipoMovimiento, updateTipoMovimientoDto);
-    return await this.tipoMovimientoRepository.save(tipoMovimiento);
+    try {
+      return await this.tipoMovimientoRepository.save(tipoMovimiento);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de movimiento '${updateTipoMovimientoDto.tipo_movimiento}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {

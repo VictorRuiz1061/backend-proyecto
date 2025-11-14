@@ -3,12 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProgramasService } from './programas.service';
 import { ProgramasController } from './programas.controller';
 import { Programa } from './entities/programa.entity';
+import { Area } from '../areas/entities/area.entity';
 import { AreasModule } from '../areas/areas.module';
 import { FichasModule } from '../fichas/fichas.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Programa]),
+    TypeOrmModule.forFeature([Programa, Area]),
     forwardRef(() => AreasModule),
     forwardRef(() => FichasModule),
   ],

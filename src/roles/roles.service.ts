@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -13,8 +13,15 @@ export class RolesService {
   ) {}
 
   async create(createRoleDto: CreateRoleDto) {
-    const rol = this.rolRepository.create(createRoleDto);
-    return await this.rolRepository.save(rol);
+    try {
+      const rol = this.rolRepository.create(createRoleDto);
+      return await this.rolRepository.save(rol);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El rol con el nombre '${createRoleDto.nombre_rol}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -55,11 +62,26 @@ export class RolesService {
   async update(id: number, updateRoleDto: UpdateRoleDto) {
     const rol = await this.findOne(id);
     Object.assign(rol, updateRoleDto);
-    return await this.rolRepository.save(rol);
+    try {
+      return await this.rolRepository.save(rol);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El rol con el nombre '${updateRoleDto.nombre_rol}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const rol = await this.findOne(id);
-    return await this.rolRepository.remove(rol);
+    try {
+      await this.rolRepository.remove(rol);
+      return { message: `El rol con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este rol no se puede eliminar porque está asignado a uno o más permisos o usuarios.');
+      }
+      throw error;
+    }
   }
 }

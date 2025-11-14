@@ -6,7 +6,7 @@ export class TipoMovimiento {
   @PrimaryGeneratedColumn()
   id_tipo_movimiento: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, unique: true })
   tipo_movimiento: string;
 
   @Column({ type: 'boolean', default: true })

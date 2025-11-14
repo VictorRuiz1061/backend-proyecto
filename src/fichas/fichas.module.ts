@@ -5,10 +5,12 @@ import { FichasController } from './fichas.controller';
 import { Ficha } from './entities/ficha.entity';
 import { ProgramasModule } from '../programas/programas.module';
 import { UsuariosModule } from '../usuarios/usuarios.module';
+import { Programa } from '../programas/entities/programa.entity';
+import { Usuario } from '../usuarios/entities/usuario.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ficha]),
+    TypeOrmModule.forFeature([Ficha, Programa, Usuario]),
     forwardRef(() => ProgramasModule),
     forwardRef(() => UsuariosModule),
   ],

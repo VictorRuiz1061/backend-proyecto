@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAreaDto } from './dto/create-area.dto';
@@ -13,8 +13,15 @@ export class AreasService {
   ) {}
 
   async create(createAreaDto: CreateAreaDto) {
-    const area = this.areaRepository.create(createAreaDto);
-    return await this.areaRepository.save(area);
+    try {
+      const area = this.areaRepository.create(createAreaDto);
+      return await this.areaRepository.save(area);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El área con el nombre '${createAreaDto.nombre_area}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -52,11 +59,26 @@ export class AreasService {
   async update(id: number, updateAreaDto: UpdateAreaDto) {
     const area = await this.findOne(id);
     Object.assign(area, updateAreaDto);
-    return await this.areaRepository.save(area);
+    try {
+      return await this.areaRepository.save(area);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El área con el nombre '${updateAreaDto.nombre_area}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const area = await this.findOne(id);
-    return await this.areaRepository.remove(area);
+    try {
+      await this.areaRepository.remove(area);
+      return { message: `El área con ID ${id} ha sido eliminada` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Esta área no se puede eliminar porque está asignada a uno o más programas.');
+      }
+      throw error;
+    }
   }
 }

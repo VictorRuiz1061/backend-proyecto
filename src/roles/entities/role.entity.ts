@@ -7,7 +7,7 @@ export class Rol {
   @PrimaryGeneratedColumn()
   id_rol: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   nombre_rol: string;
 
   @Column('text')

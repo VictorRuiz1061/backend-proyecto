@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateCategoriaElementoDto } from './dto/create-categoria_elemento.dto';
@@ -60,6 +60,14 @@ export class CategoriaElementoService {
 
   async remove(id: number) {
     const categoriaElemento = await this.findOne(id);
-    return await this.categoriaElementoRepository.remove(categoriaElemento);
+    try {
+      await this.categoriaElementoRepository.remove(categoriaElemento);
+      return { message: `La categoría de elemento con ID ${id} ha sido eliminada` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Esta categoría de elemento no se puede eliminar porque tiene materiales asociados.');
+      }
+      throw error;
+    }
   }
 }

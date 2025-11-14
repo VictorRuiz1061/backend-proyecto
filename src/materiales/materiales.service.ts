@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateMaterialeDto } from './dto/create-materiale.dto';
@@ -64,6 +64,14 @@ export class MaterialesService {
 
   async remove(id: number) {
     const material = await this.findOne(id);
-    return await this.materialRepository.remove(material);
+    try {
+      await this.materialRepository.remove(material);
+      return { message: `El material con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este material no se puede eliminar porque tiene movimientos o características asociadas.');
+      }
+      throw error;
+    }
   }
 }

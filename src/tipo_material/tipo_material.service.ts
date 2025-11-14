@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateTipoMaterialeDto } from './dto/create-tipo_material.dto';
@@ -13,8 +13,15 @@ export class TipoMaterialService {
   ) {}
 
   async create(createTipoMaterialDto: CreateTipoMaterialeDto) {
-    const tipoMaterial = this.tipoMaterialRepository.create(createTipoMaterialDto);
-    return await this.tipoMaterialRepository.save(tipoMaterial);
+    try {
+      const tipoMaterial = this.tipoMaterialRepository.create(createTipoMaterialDto);
+      return await this.tipoMaterialRepository.save(tipoMaterial);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de material '${createTipoMaterialDto.tipo_elemento}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -52,11 +59,26 @@ export class TipoMaterialService {
   async update(id: number, updateTipoMaterialDto: UpdateTipoMaterialDto) {
     const tipoMaterial = await this.findOne(id);
     Object.assign(tipoMaterial, updateTipoMaterialDto);
-    return await this.tipoMaterialRepository.save(tipoMaterial);
+    try {
+      return await this.tipoMaterialRepository.save(tipoMaterial);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de material '${updateTipoMaterialDto.tipo_elemento}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const tipoMaterial = await this.findOne(id);
-    return await this.tipoMaterialRepository.remove(tipoMaterial);
+    try {
+      await this.tipoMaterialRepository.remove(tipoMaterial);
+      return { message: `El tipo de material con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este tipo de material no se puede eliminar porque tiene materiales asociados.');
+      }
+      throw error;
+    }
   }
 }

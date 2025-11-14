@@ -6,7 +6,7 @@ export class TipoMaterial {
   @PrimaryGeneratedColumn()
   id_tipo_material: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, unique: true })
   tipo_elemento: string;
 
   @Column({ type: 'boolean', default: true })

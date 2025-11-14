@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateSitioDto } from './dto/create-sitio.dto';
@@ -17,7 +17,14 @@ export class SitioService {
       ...createSitioDto,
       tipo_sitio_id: { id_tipo_sitio: createSitioDto.tipo_sitio_id },
     });
-    return await this.sitioRepository.save(sitio);
+    try {
+      return await this.sitioRepository.save(sitio);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El sitio con el nombre '${createSitioDto.nombre_sitio}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -58,11 +65,26 @@ export class SitioService {
   async update(id: number, updateSitioDto: UpdateSitioDto) {
     const sitio = await this.findOne(id);
     Object.assign(sitio, updateSitioDto);
-    return await this.sitioRepository.save(sitio);
+    try {
+      return await this.sitioRepository.save(sitio);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El sitio con el nombre '${updateSitioDto.nombre_sitio}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const sitio = await this.findOne(id);
-    return await this.sitioRepository.remove(sitio);
+    try {
+      await this.sitioRepository.remove(sitio);
+      return { message: `El sitio con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este sitio no se puede eliminar porque tiene inventario asociado.');
+      }
+      throw error;
+    }
   }
 }

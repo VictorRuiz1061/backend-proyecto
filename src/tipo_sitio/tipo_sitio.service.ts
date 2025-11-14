@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateTipoSitioDto } from './dto/create-tipo_sitio.dto';
@@ -13,8 +13,15 @@ export class TipoSitioService {
   ) {}
 
   async create(createTipoSitioDto: CreateTipoSitioDto) {
-    const tipoSitio = this.tipoSitioRepository.create(createTipoSitioDto);
-    return await this.tipoSitioRepository.save(tipoSitio);
+    try {
+      const tipoSitio = this.tipoSitioRepository.create(createTipoSitioDto);
+      return await this.tipoSitioRepository.save(tipoSitio);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de sitio '${createTipoSitioDto.nombre_tipo_sitio}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -52,11 +59,26 @@ export class TipoSitioService {
   async update(id: number, updateTipoSitioDto: UpdateTipoSitioDto) {
     const tipoSitio = await this.findOne(id);
     Object.assign(tipoSitio, updateTipoSitioDto);
-    return await this.tipoSitioRepository.save(tipoSitio);
+    try {
+      return await this.tipoSitioRepository.save(tipoSitio);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(`El tipo de sitio '${updateTipoSitioDto.nombre_tipo_sitio}' ya existe.`);
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const tipoSitio = await this.findOne(id);
-    return await this.tipoSitioRepository.remove(tipoSitio);
+    try {
+      await this.tipoSitioRepository.remove(tipoSitio);
+      return { message: `El tipo de sitio con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este tipo de sitio no se puede eliminar porque está asignado a uno o más sitios.');
+      }
+      throw error;
+    }
   }
 }

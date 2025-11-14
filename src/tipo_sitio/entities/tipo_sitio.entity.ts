@@ -6,7 +6,7 @@ export class TipoSitio {
   @PrimaryGeneratedColumn()
   id_tipo_sitio: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   nombre_tipo_sitio: string;
 
   @Column({ type: 'boolean', default: true })

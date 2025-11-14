@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
@@ -14,7 +14,14 @@ export class UsuariosService {
 
   async create(createUsuarioDto: CreateUsuarioDto) {
     const usuario = this.usuarioRepository.create(createUsuarioDto);
-    return await this.usuarioRepository.save(usuario);
+    try {
+      return await this.usuarioRepository.save(usuario);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('La cédula o el email ya están registrados.');
+      }
+      throw error;
+    }
   }
 
   async findAll() {
@@ -57,11 +64,26 @@ export class UsuariosService {
   async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
     const usuario = await this.findOne(id);
     Object.assign(usuario, updateUsuarioDto);
-    return await this.usuarioRepository.save(usuario);
+    try {
+      return await this.usuarioRepository.save(usuario);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('La cédula o el email ya están registrados.');
+      }
+      throw error;
+    }
   }
 
   async remove(id: number) {
     const usuario = await this.findOne(id);
-    return await this.usuarioRepository.remove(usuario);
+    try {
+      await this.usuarioRepository.remove(usuario);
+      return { message: `El usuario con ID ${id} ha sido eliminado` };
+    } catch (error) {
+      if (error.code === '23503') {
+        throw new ConflictException('Este usuario no se puede eliminar porque tiene registros asociados.');
+      }
+      throw error;
+    }
   }
 }
