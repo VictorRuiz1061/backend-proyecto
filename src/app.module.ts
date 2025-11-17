@@ -19,7 +19,7 @@ import { TipoMaterialModule } from './tipo_material/tipo_material.module';
 import { CategoriaElementoModule } from './categoria_elemento/categoria_elemento.module';
 import { SeedModule } from './seeders/seed.module';
 import { AuthModule } from './auth/auth.module';
-//import { DynamicSchemaModule } from './dynamic-schema/dynamic-schema.module';
+import { DynamicSchemaModule } from './dynamic-schema/dynamic-schema.module';
 
 @Module({
   imports: [
@@ -58,7 +58,7 @@ import { AuthModule } from './auth/auth.module';
     CategoriaElementoModule,
     AuthModule,
     SeedModule,
-    // DynamicSchemaModule,
+    DynamicSchemaModule,
   ],
   controllers: [],
   providers: [],
