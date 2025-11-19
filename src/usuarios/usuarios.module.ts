@@ -6,6 +6,7 @@ import { Usuario } from './entities/usuario.entity';
 import { FichasModule } from '../fichas/fichas.module';
 import { RolesModule } from '../roles/roles.module';
 import { MovimientoModule } from '../movimientos/movimiento.module';
+import { ImageModule } from 'src/image/image.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MovimientoModule } from '../movimientos/movimiento.module';
     forwardRef(() => FichasModule),
     forwardRef(() => RolesModule),
     forwardRef(() => MovimientoModule),
+    ImageModule, // 👈 IMPORTANTE
   ],
   controllers: [UsuariosController],
   providers: [UsuariosService],

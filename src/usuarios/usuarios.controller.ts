@@ -1,15 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageInterceptor } from 'src/common/interceptors/image.interceptor';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuariosService.create(createUsuarioDto);
+  @UseInterceptors(FileInterceptor('imagen'), ImageInterceptor)
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createUsuarioDto: CreateUsuarioDto,
+  ) {
+    return this.usuariosService.create(createUsuarioDto, file);
   }
 
   @Get()
@@ -28,8 +34,13 @@ export class UsuariosController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+  @UseInterceptors(FileInterceptor('imagen'), ImageInterceptor)
+  update(
+    @Param('id') id: string,
+    @Body() updateUsuarioDto: UpdateUsuarioDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.usuariosService.update(+id, updateUsuarioDto, file);
   }
 
   @Delete(':id')

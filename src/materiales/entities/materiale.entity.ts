@@ -28,8 +28,9 @@ export class Material {
   @Column({ type: 'boolean', default: true })
   estado: boolean;
 
-  @Column({ type: 'date' })
-  fecha_vencimiento: Date;
+  @Column({ type: 'date', nullable: true })
+  fecha_vencimiento: Date | null;
+
 
   @Column('text', { nullable: true })
   imagen: string;

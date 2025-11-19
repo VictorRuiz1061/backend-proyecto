@@ -1,4 +1,4 @@
-import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsNotEmpty, ValidateIf, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
 export class CreateMaterialeDto {
@@ -18,9 +18,9 @@ export class CreateMaterialeDto {
   @IsString({ message: 'La unidad de medida debe ser una cadena de texto.' })
   unidad_medida: string;
 
-  @IsOptional()
-  @IsDateString( {}, { message: 'La fecha de vencimiento debe ser una cadena de fecha válida.' },)
-  fecha_vencimiento: string;
+  @ValidateIf(o => o.producto_perecedero === true)
+  @IsDateString({}, { message: 'La fecha de vencimiento debe ser una fecha válida' })
+  fecha_vencimiento?: Date;
 
   @IsNotEmpty({ message: 'El producto perecedero no puede estar vacío.' })
   @IsBoolean({ message: 'El producto perecedero debe ser un valor booleano.' })

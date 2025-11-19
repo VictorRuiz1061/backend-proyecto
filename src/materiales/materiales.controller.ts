@@ -1,15 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MaterialesService } from './materiales.service';
 import { CreateMaterialeDto } from './dto/create-materiale.dto';
 import { UpdateMaterialeDto } from './dto/update-materiale.dto';
+import { UploadImage } from 'src/common/decorators/upload-image.decorator';
 
 @Controller('materiales')
 export class MaterialesController {
   constructor(private readonly materialesService: MaterialesService) {}
 
   @Post()
-  create(@Body() createMaterialeDto: CreateMaterialeDto) {
-    return this.materialesService.create(createMaterialeDto);
+  @UploadImage('materiales')
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createDto: CreateMaterialeDto,
+  ) {
+    return this.materialesService.create(createDto, file);
   }
 
   @Get()
@@ -28,8 +43,13 @@ export class MaterialesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMaterialeDto: UpdateMaterialeDto) {
-    return this.materialesService.update(+id, updateMaterialeDto);
+  @UploadImage('materiales')
+  update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateMaterialeDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.materialesService.update(+id, updateDto, file);
   }
 
   @Delete(':id')

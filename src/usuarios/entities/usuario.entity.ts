@@ -30,7 +30,7 @@ export class Usuario {
   telefono: string;
 
   @Column('text', { nullable: true })
-  imagen: string;
+  imagen: string | null;
 
   @Column({ type: 'boolean', default: true })
   estado: boolean;
